@@ -16,32 +16,87 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <html>
-    <head>
-        <meta charset='utf-8'>
-        <title>PSFree-Lapse Exploit For PS4 9.00</title>
-        <style>
-            @font-face {
-                font-family: 'logging';
-                src: url('fonts/LiberationMono-Regular.ttf');
-            }
-            #console {
-                font-family: 'logging';
-            }
-        </style>
-        <script>
-        if (window.applicationCache.status=='0')
-        {
-          window.location.replace("cache.html");
+
+<head>
+    <meta charset='utf-8'>
+    <title>PSFree-Lapse Exploit For PS4 9.00</title>
+    <style>
+        @font-face {
+            font-family: 'logging';
+            src: url('fonts/LiberationMono-Regular.ttf');
         }
-        </script>
-    </head>
-    <body>
-        PSFree: A PS4/PS5 Exploit Chain
-        <br>
-        <br>
-        See <a href='./about.html' data-jslicense='1'>JavaScript license information</a> for the
-        source code and license.<br>
+
+        body {
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', 'LiberationMono-Regular', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: rgba(34, 34, 34, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            padding: 32px 24px 24px 24px;
+        }
+
+        h1 {
+            color: #6cf;
+            margin-top: 0;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+        }
+
+        #console {
+            font-family: 'logging', monospace;
+            background: #181818;
+            color: #b2ffb2;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 120px;
+            font-size: 1.1em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .credits {
+            text-align: right;
+            font-size: 0.95em;
+            color: #aaa;
+            margin-top: 24px;
+        }
+
+        a {
+            color: #6cf;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            color: #fff;
+        }
+    </style>
+    <script>
+        if (window.applicationCache.status == '0') {
+            window.location.replace("cache.html");
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>PSFree-Lapse Exploit For PS4 9.00</h1>
+        <p>PSFree: A PS4/PS5 Exploit Chain</p>
+        <p>See <a href='./about.html' data-jslicense='1'>JavaScript license information</a> for the source code and
+            license.</p>
         <pre id='console'></pre>
-    </body>
-    <script type='module' src='./alert.mjs'></script>
+        <div class="credits">
+            Part of the <b>PSFree</b> main project<br>
+            Contributor: <b>menamaged</b>
+        </div>
+    </div>
+</body>
+<script type='module' src='./alert.mjs'></script>
+
 </html>

@@ -1,19 +1,27 @@
-/* Copyright (C) 2025 anonymous
+/*
+    PSFree - View Module
 
-This file is part of PSFree.
+    Copyright (C) 2025 menaxmaged
+    Additional contributions: menamaged
 
-PSFree is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
+    This file is part of PSFree.
+    PSFree is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
 
-PSFree is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+    PSFree is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+    Credits:
+        - Owner: menaxmaged
+        - Contributor: menamaged
+*/
 
 import { Int, lohi_from_one } from './int64.mjs';
 import { Addr } from './mem.mjs';
@@ -21,6 +29,21 @@ import { BufferView } from './rw.mjs';
 
 import * as config from '../config.mjs';
 import * as mt from './memtools.mjs';
+
+/**
+ * Helper to format UI output for displaying memory views and values.
+ * Returns a styled HTML string for use in web interfaces.
+ * @param {string} title - Section title
+ * @param {string} content - Main content
+ * @returns {string} HTML string
+ */
+export function formatUIView(title, content) {
+    return `<div style="background:#222;color:#eee;padding:1em;border-radius:8px;margin-bottom:1em;">
+        <h2 style="margin-top:0;color:#6cf;">${title}</h2>
+        <pre style="font-family:monospace;font-size:1em;">${content}</pre>
+        <div style="text-align:right;font-size:0.9em;color:#aaa;">PSFree by menaxmaged &amp; menamaged</div>
+    </div>`;
+}
 
 // View constructors will always get the buffer property in order to make sure
 // that the JSArrayBufferView is a WastefulTypedArray. m_vector may change if
@@ -35,6 +58,10 @@ import * as mt from './memtools.mjs';
 // Subclasses of TypedArray are still implemented as a JSArrayBufferView, so
 // get_view_vector() still works on them.
 
+/**
+ * Mixin for TypedArray views with address and size helpers.
+ * Adds caching and PS4/PS5 compatibility workarounds.
+ */
 function ViewMixin(superclass) {
     const res = class extends superclass {
         constructor(...args) {
@@ -42,6 +69,9 @@ function ViewMixin(superclass) {
             this.buffer;
         }
 
+        /**
+         * Returns cached address of the view.
+         */
         get addr() {
             let res = this._addr_cache;
             if (res !== undefined) {
@@ -52,32 +82,30 @@ function ViewMixin(superclass) {
             return res;
         }
 
+        /**
+         * Returns the size in bytes.
+         */
         get size() {
             return this.byteLength;
         }
 
+        /**
+         * Returns address at index.
+         */
         addr_at(index) {
             const size = this.BYTES_PER_ELEMENT;
             return this.addr.add(index * size);
         }
 
+        /**
+         * Gets signed value at index.
+         */
         sget(index) {
             return this[index] | 0;
         }
     };
 
-    // workaround for known affected versions: ps4 [6.00, 10.00)
-    //
-    // see from() and of() from
-    // WebKit/Source/JavaScriptCore/builtins/TypedArrayConstructor.js at PS4
-    // 8.0x
-    //
-    // @getByIdDirectPrivate(this, "allocateTypedArray") will fail when "this"
-    // isn't one of the built-in TypedArrays. this is a violation of the
-    // ECMAScript spec at that time
-    //
-    // TODO assumes ps4, support ps5 as well
-    // FIXME define the from/of workaround functions once
+    // PS4/PS5 compatibility workaround for TypedArray constructors
     if (0x600 <= config.target && config.target < 0x1000) {
         res.from = function from(...args) {
             const base = this.__proto__;
@@ -93,10 +121,22 @@ function ViewMixin(superclass) {
     return res;
 }
 
-export class View1 extends ViewMixin(Uint8Array) {}
-export class View2 extends ViewMixin(Uint16Array) {}
-export class View4 extends ViewMixin(Uint32Array) {}
+/**
+ * Uint8Array view with address helpers.
+ */
+export class View1 extends ViewMixin(Uint8Array) { }
+/**
+ * Uint16Array view with address helpers.
+ */
+export class View2 extends ViewMixin(Uint16Array) { }
+/**
+ * Uint32Array view with address helpers.
+ */
+export class View4 extends ViewMixin(Uint32Array) { }
 
+/**
+ * Buffer view with address helpers.
+ */
 export class Buffer extends BufferView {
     get addr() {
         let res = this._addr_cache;
@@ -128,10 +168,12 @@ if (0x600 <= config.target && config.target < 0x1000) {
     };
 }
 
+/**
+ * Mixin for variable views (Byte, Short, Word).
+ */
 const VariableMixin = superclass => class extends superclass {
-    constructor(value=0) {
-        // unlike the View classes, we don't allow number coercion. we
-        // explicitly allow floats unlike Int
+    constructor(value = 0) {
+        // Only allow numbers, including floats
         if (typeof value !== 'number') {
             throw TypeError('value not a number');
         }
@@ -151,11 +193,23 @@ const VariableMixin = superclass => class extends superclass {
     }
 };
 
-export class Byte extends VariableMixin(View1) {}
-export class Short extends VariableMixin(View2) {}
+/**
+ * Single byte variable view.
+ */
+export class Byte extends VariableMixin(View1) { }
+/**
+ * Single short variable view.
+ */
+export class Short extends VariableMixin(View2) { }
+/**
+ * Single word variable view.
+ */
 // Int was already taken by int64.mjs
-export class Word extends VariableMixin(View4) {}
+export class Word extends VariableMixin(View4) { }
 
+/**
+ * Array of 64-bit integers (Int).
+ */
 export class LongArray {
     constructor(length) {
         this.buffer = new DataView(new ArrayBuffer(length * 8));
@@ -200,7 +254,9 @@ export class LongArray {
     }
 }
 
-// mutable Int (we are explicitly using Int's private fields)
+/**
+ * Mixin for mutable 64-bit integer views.
+ */
 const Word64Mixin = superclass => class extends superclass {
     constructor(...args) {
         if (!args.length) {
@@ -253,9 +309,15 @@ const Word64Mixin = superclass => class extends superclass {
     }
 };
 
+/**
+ * Mutable 64-bit integer view.
+ */
 export class Long extends Word64Mixin(Int) {
     as_addr() {
         return new Addr(this);
     }
 }
-export class Pointer extends Word64Mixin(Addr) {}
+/**
+ * Mutable pointer view (64-bit address).
+ */
+export class Pointer extends Word64Mixin(Addr) { }
