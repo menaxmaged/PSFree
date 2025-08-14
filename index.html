@@ -78,9 +78,31 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         }
     </style>
     <script>
+        // Redirect to cache.html if needed
         if (window.applicationCache.status == '0') {
             window.location.replace("cache.html");
         }
+
+        // Platform check: Only allow on PS4
+        function isPS4() {
+            // User-Agent check for PS4 WebKit
+            return navigator.userAgent.includes('PlayStation 4');
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            if (!isPS4()) {
+                document.querySelector('.container').innerHTML = `
+                    <h1>PSFree-Lapse Exploit</h1>
+                    <div style='color:#ff6666;font-size:1.3em;margin:2em 0;'>
+                        This exploit is only supported on <b>PlayStation 4</b>.<br>
+                        Please access this page from a PS4 browser.
+                    </div>
+                    <div class='credits'>Part of the <b>PSFree</b> main project<br>Main author: <b>menaxmaged</b><br>Contributor: <b>menamaged</b></div>
+                `;
+                // Optionally, disable further scripts
+                document.getElementById('console').style.display = 'none';
+            }
+        });
     </script>
 </head>
 
@@ -88,8 +110,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <div class="container">
         <h1>PSFree-Lapse Exploit For PS4 9.00</h1>
         <p>PSFree: A PS4/PS5 Exploit Chain</p>
-        <p>See <a href='./about.html' data-jslicense='1'>JavaScript license information</a> for the source code and
-            license.</p>
         <pre id='console'></pre>
         <div class="credits">
             Part of the <b>PSFree</b> main project<br>
