@@ -24,17 +24,38 @@ export class DieError extends Error {
     }
 }
 
-export function die(msg='') {
+export function die(msg = '') {
     throw new DieError(msg);
 }
 
 const console = document.getElementById('console');
-export function log(msg='') {
-    console.append(msg + '\n');
+
+function isPS4() {
+    return navigator.userAgent.includes('PlayStation 4');
+}
+
+export function log(msg = '') {
+    if (!isPS4()) {
+        if (console) {
+            console.innerHTML = '<span style="color:#ff6666">This exploit only works on PlayStation 4.</span>';
+        }
+        return;
+    }
+    if (console) {
+        console.append(msg + '\n');
+    }
 }
 
 export function clear_log() {
-    console.innerHTML = null;
+    if (!isPS4()) {
+        if (console) {
+            console.innerHTML = '<span style="color:#ff6666">This exploit only works on PlayStation 4.</span>';
+        }
+        return;
+    }
+    if (console) {
+        console.innerHTML = null;
+    }
 }
 
 // alignment must be 32 bits and is a power of 2
@@ -48,17 +69,17 @@ export function align(a, alignment) {
     return new type(low, a.hi);
 }
 
-export async function send(url, buffer, file_name, onload=() => {}) {
+export async function send(url, buffer, file_name, onload = () => { }) {
     const file = new File(
         [buffer],
         file_name,
-        {type:'application/octet-stream'}
+        { type: 'application/octet-stream' }
     );
     const form = new FormData();
     form.append('upload', file);
 
     log('send');
-    const response = await fetch(url, {method: 'POST', body: form});
+    const response = await fetch(url, { method: 'POST', body: form });
 
     if (!response.ok) {
         throw Error(`Network response was not OK, status: ${response.status}`);
@@ -70,7 +91,7 @@ export async function send(url, buffer, file_name, onload=() => {}) {
 //
 // yielding also lets the DOM update. which is useful since we use the DOM for
 // logging and we loop when waiting for a collection to occur
-export function sleep(ms=0) {
+export function sleep(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -99,8 +120,8 @@ export function hexdump(view) {
     function to_hex(view, offset, length) {
         return (
             [...view.slice(offset, offset + length)]
-            .map(e => hex_np(e).padStart(2, '0'))
-            .join(' ')
+                .map(e => hex_np(e).padStart(2, '0'))
+                .join(' ')
         );
     }
 
